@@ -87,6 +87,30 @@ describe('FeedService', () => {
             expect(data.data).toEqual([]);
         });
 
+        it('should hide markdown image syntax from generated summaries', async () => {
+            await app.request('/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer mock_token_1',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'Image First Feed',
+                    content: '![cover](https://example.com/cover.png#blurhash=test&width=100&height=50)\n\n正文内容',
+                    listed: true,
+                    draft: false,
+                    tags: [],
+                }),
+            }, env);
+
+            const res = await app.request('/?page=1&limit=10', { method: 'GET' }, env);
+
+            expect(res.status).toBe(200);
+            const data = await res.json() as any;
+            expect(data.data[0].summary).toBe('正文内容');
+            expect(data.data[0].avatar).toBe('https://example.com/cover.png#blurhash=test&width=100&height=50');
+        });
+
         it('should filter drafts for non-admin users', async () => {
             // Create a draft feed
             await app.request('/', {

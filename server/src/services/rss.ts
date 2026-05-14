@@ -6,6 +6,7 @@ import { feeds, users } from "../db/schema";
 import { extractImage } from "../utils/image";
 import { path_join } from "../utils/path";
 import { getStorageObject, getStoragePublicUrl, headStorageObject, putStorageObjectAtKey } from "../utils/storage";
+import { buildFeedSummary } from "../utils/summary";
 import { FAVICON_ALLOWED_TYPES, getFaviconKey } from "./favicon";
 import type { DB } from "../core/hono-types";
 
@@ -239,11 +240,7 @@ async function generateFeed(env: Env, db: DB, frontendUrl: string, c?: AppContex
             id: other.id?.toString() || "0",
             link: `${frontendUrl}/feed/${other.id}`,
             date: other.createdAt,
-            description: summary.length > 0
-                ? summary
-                : content.length > 100
-                    ? content.slice(0, 100)
-                    : content,
+            description: buildFeedSummary(summary, content),
             content: contentHtml,
             author: user ? [{ name: user.username }] : undefined,
             image: extractImage(content),

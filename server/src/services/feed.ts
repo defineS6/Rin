@@ -5,6 +5,7 @@ import { profileAsync } from "../core/server-timing";
 import { feeds, visits, visitStats } from "../db/schema";
 import { HyperLogLog } from "../utils/hyperloglog";
 import { extractImageWithMetadata } from "../utils/image";
+import { buildFeedSummary } from "../utils/summary";
 import { syncFeedAISummaryQueueState } from "./feed-ai-summary";
 import { bindTagToPost } from "./tag";
 import { clearFeedCache } from "./clear-feed-cache";
@@ -86,7 +87,7 @@ export function FeedService(): Hono<{
         }))).map(({ content, hashtags, summary, ...other }: any) => {
             const avatar = extractImageWithMetadata(content);
             return {
-                summary: summary.length > 0 ? summary : content.length > 100 ? content.slice(0, 100) : content,
+                summary: buildFeedSummary(summary, content),
                 hashtags: hashtags.map(({ hashtag }: any) => hashtag),
                 avatar,
                 ...other
@@ -301,11 +302,7 @@ export function FeedService(): Hono<{
         function formatAndCacheData(feed: any, feedDirection: "previous_feed" | "next_feed") {
             if (feed) {
                 const hashtags_flatten = feed.hashtags.map((f: any) => f.hashtag);
-                const summary = feed.summary.length > 0
-                    ? feed.summary
-                    : feed.content.length > 50
-                        ? feed.content.slice(0, 50)
-                        : feed.content;
+                const summary = buildFeedSummary(feed.summary, feed.content, 50);
                 const cacheKey = `${feed.id}_${feedDirection}_${id_num}`;
                 const cacheData = {
                     id: feed.id,
@@ -524,7 +521,7 @@ export function SearchService(): Hono<{
             orderBy: [desc(feeds.createdAt), desc(feeds.updatedAt)],
         })))).map(({ content, hashtags, summary, ...other }: any) => {
             return {
-                summary: summary.length > 0 ? summary : content.length > 100 ? content.slice(0, 100) : content,
+                summary: buildFeedSummary(summary, content),
                 hashtags: hashtags.map(({ hashtag }: any) => hashtag),
                 ...other
             };
@@ -589,7 +586,7 @@ export function WordPressService(): Hono<{
             const draft = item?.['wp:status'] !== 'publish';
             const contentHtml = item?.['content:encoded'];
             const content = html2md(contentHtml);
-            const summary = content.length > 100 ? content.slice(0, 100) : content;
+            const summary = buildFeedSummary("", content);
             let tags = item?.['category'];
 
             if (tags && Array.isArray(tags)) {
@@ -660,4 +657,3 @@ type FeedItem = {
     updatedAt: Date;
     tags?: string[];
 }
-
