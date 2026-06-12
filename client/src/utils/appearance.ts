@@ -50,11 +50,8 @@ function toCssUrl(value: string) {
 export function applyAppearanceConfig(config: Record<string, unknown>) {
   const root = document.documentElement;
   const backgroundImage = normalizeBackgroundImage(config[APPEARANCE_CONFIG_KEYS.backgroundImage]);
-  const fontPreset = normalizeFontPreset(
-    typeof config[APPEARANCE_CONFIG_KEYS.fontPreset] === "string"
-      ? config[APPEARANCE_CONFIG_KEYS.fontPreset]
-      : undefined,
-  );
+  const fontPresetValue = config[APPEARANCE_CONFIG_KEYS.fontPreset];
+  const fontPreset = normalizeFontPreset(typeof fontPresetValue === "string" ? fontPresetValue : undefined);
 
   root.style.setProperty("--site-font-family", FONT_FAMILY_BY_PRESET[fontPreset]);
   root.style.setProperty("--site-background-image", backgroundImage ? toCssUrl(backgroundImage) : "none");
