@@ -7,6 +7,7 @@ import Modal from "react-modal";
 import { client, oauth_url } from "../app/runtime";
 import { Button } from "../components/button";
 import { useAlert } from "../components/dialog.tsx";
+import { ImageUploadInput } from "../components/image-upload-input";
 import { HeaderLayoutPreview } from "../components/site-header/layout-preview";
 import {
   HEADER_BEHAVIOR_OPTIONS,
@@ -18,6 +19,7 @@ import { FEED_CARD_VARIANTS, normalizeFeedCardVariant } from "../components/feed
 import { FeedCardPreview } from "../components/feed-card-preview";
 import { FEED_LAYOUT_OPTIONS, normalizeFeedLayout } from "../components/feed-layout-options";
 import { useSiteConfig } from "../hooks/useSiteConfig";
+import { APPEARANCE_CONFIG_KEYS, FONT_PRESETS, applyAppearanceConfig, normalizeFontPreset } from "../utils/appearance";
 import { applyThemeColor, normalizeThemeColor } from "../utils/theme-color";
 import { AISummarySettings } from "./settings-ai";
 import { ItemButton, ItemImageInput, ItemInput, ItemSwitch, ItemTitle, ItemWithUpload } from "./settings-items";
@@ -59,6 +61,7 @@ export function Settings() {
   const [saving, setSaving] = useState(false);
   const [testingWebhook, setTestingWebhook] = useState(false);
   const [webhookTestMessage, setWebhookTestMessage] = useState("");
+  const [backgroundImageOpen, setBackgroundImageOpen] = useState(false);
   const [draft, setDraft] = useState<SettingsDraft>({ clientConfig: {}, serverConfig: {} });
   const [initialDraft, setInitialDraft] = useState<SettingsDraft>({ clientConfig: {}, serverConfig: {} });
   const [hasStoredAiApiKey, setHasStoredAiApiKey] = useState(false);
@@ -79,6 +82,7 @@ export function Settings() {
         initialDraftRef.current = state.draft;
         setHasStoredAiApiKey(state.hasStoredAiApiKey);
         mergeSessionConfig(state.draft.clientConfig);
+        applyAppearanceConfig(state.draft.clientConfig);
         applyThemeColor(getDraftThemeColor(state.draft));
       })
       .catch((err: any) => {
@@ -90,6 +94,7 @@ export function Settings() {
     ref.current = true;
 
     return () => {
+      applyAppearanceConfig(initialDraftRef.current.clientConfig);
       applyThemeColor(getDraftThemeColor(initialDraftRef.current));
     };
   }, [showAlert, t]);
@@ -98,6 +103,8 @@ export function Settings() {
   const aiValue = useMemo(() => buildAIConfigDraftValue(draft, hasStoredAiApiKey), [draft, hasStoredAiApiKey]);
   const hasUnsavedChanges = !areSettingsDraftsEqual(draft, initialDraft);
   const themeColorValue = normalizeThemeColor(String(clientConfig.get("theme.color") ?? "#4f46e5"));
+  const backgroundImageValue = String(clientConfig.get(APPEARANCE_CONFIG_KEYS.backgroundImage) ?? "");
+  const fontPresetValue = normalizeFontPreset(clientConfig.get<string>(APPEARANCE_CONFIG_KEYS.fontPreset));
   const feedLayoutValue = normalizeFeedLayout(String(clientConfig.get("feed.layout") ?? "list"));
   const feedCardVariantValue = normalizeFeedCardVariant(String(clientConfig.get("feed.card_variant") ?? "default"));
   const previewSiteName = String(clientConfig.get("site.name") ?? clientConfig.default("site.name") ?? "Rin");
@@ -107,8 +114,14 @@ export function Settings() {
     setDraft((current) => updateDraftConfig(current, type, key, value));
   }
 
+  function setAppearanceConfigValue(key: string, value: string) {
+    setConfigValue("client", key, value);
+    applyAppearanceConfig({ ...draft.clientConfig, [key]: value });
+  }
+
   function handleReset() {
     setDraft(initialDraft);
+    applyAppearanceConfig(initialDraft.clientConfig);
     applyThemeColor(getDraftThemeColor(initialDraft));
   }
 
@@ -121,6 +134,7 @@ export function Settings() {
       initialDraftRef.current = state.draft;
       setHasStoredAiApiKey(state.hasStoredAiApiKey || aiValue.apiKey.trim().length > 0);
       mergeSessionConfig(state.draft.clientConfig);
+      applyAppearanceConfig(state.draft.clientConfig);
       window.dispatchEvent(new Event("storage"));
       showAlert(t("settings.ai_summary.save_success"));
     } catch (err) {
@@ -395,6 +409,79 @@ export function Settings() {
                     </label>
                   </div>
                 </SettingsCardBody>
+              </div>
+              <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
+                <button
+                  type="button"
+                  className="block w-full text-left"
+                  onClick={() => {
+                    setBackgroundImageOpen((current) => !current);
+                  }}
+                >
+                  <SettingsCardRow
+                    header={
+                      <SettingsCardHeader
+                        title={t("settings.background_image.title")}
+                        description={t("settings.background_image.desc")}
+                      />
+                    }
+                    action={
+                      <div className="flex items-center gap-3">
+                        {backgroundImageValue ? (
+                          <img
+                            src={backgroundImageValue}
+                            alt={t("settings.background_image.label")}
+                            className="h-10 w-14 rounded-xl border border-black/10 object-cover dark:border-white/10"
+                          />
+                        ) : null}
+                        <span className="max-w-56 truncate text-sm text-neutral-500 dark:text-neutral-400">
+                          {backgroundImageValue || t("settings.background_image.empty")}
+                        </span>
+                        <i
+                          className={`ri-arrow-down-s-line text-lg text-neutral-400 transition-transform ${backgroundImageOpen ? "rotate-180" : ""}`}
+                          aria-hidden="true"
+                        />
+                      </div>
+                    }
+                  />
+                </button>
+                {backgroundImageOpen ? (
+                  <SettingsCardBody>
+                    <ImageUploadInput
+                      value={backgroundImageValue}
+                      onChange={(value) => {
+                        setAppearanceConfigValue(APPEARANCE_CONFIG_KEYS.backgroundImage, value);
+                      }}
+                      onError={showAlert}
+                      placeholder={t("settings.background_image.label")}
+                    />
+                  </SettingsCardBody>
+                ) : null}
+              </div>
+              <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
+                <SettingsCardRow
+                  header={
+                    <SettingsCardHeader
+                      title={t("settings.font_preset.title")}
+                      description={t("settings.font_preset.desc")}
+                    />
+                  }
+                  action={
+                    <SearchableSelect
+                      value={fontPresetValue}
+                      onChange={(value) => {
+                        setAppearanceConfigValue(APPEARANCE_CONFIG_KEYS.fontPreset, value);
+                      }}
+                      options={FONT_PRESETS.map((value) => ({
+                        value,
+                        label: t(`settings.font_preset.options.${value}`),
+                      }))}
+                      placeholder={t("settings.font_preset.title")}
+                      emptyLabel={t("no_more")}
+                      searchable={false}
+                    />
+                  }
+                />
               </div>
               <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
                 <SettingsCardRow

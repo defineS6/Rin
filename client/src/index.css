@@ -4,6 +4,8 @@
   --theme-rgb: 79 70 229;
   --theme-hover-rgb: 55 49 160;
   --theme-active-rgb: 47 42 137;
+  --site-font-family: Cantarell, "Source Han Serif CN VF", system-ui, sans-serif;
+  --site-background-image: none;
 }
 
 /* cantarell-latin-400-normal */
@@ -21,7 +23,20 @@
 
 body {
   @apply bg-background-light dark:bg-background-dark text-gray-800;
-  font-family: Cantarell, "Source Han Serif CN VF" !important;
+  background-image:
+    linear-gradient(rgba(245, 245, 245, 0.86), rgba(245, 245, 245, 0.86)),
+    var(--site-background-image);
+  background-attachment: fixed, fixed;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  font-family: var(--site-font-family) !important;
+}
+
+[data-color-mode="dark"] body {
+  background-image:
+    linear-gradient(rgba(28, 28, 30, 0.86), rgba(28, 28, 30, 0.86)),
+    var(--site-background-image);
 }
 
 textarea:focus {
@@ -30,7 +45,7 @@ textarea:focus {
 
 .wmde-markdown {
   @apply bg-w;
-  font-family: Cantarell, "Source Han Serif CN VF" !important;
+  font-family: var(--site-font-family) !important;
 }
 
 .toc-content {

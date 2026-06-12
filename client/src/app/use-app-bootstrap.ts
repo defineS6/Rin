@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ConfigWrapper } from "@rin/config";
 import type { Profile } from "../state/profile";
 import { defaultClientConfig } from "../state/config";
+import { applyAppearanceConfig } from "../utils/appearance";
 import { applyThemeColor } from "../utils/theme-color";
 import { readBootstrappedClientConfig } from "./bootstrap-config";
 import { client } from "./runtime";
@@ -26,6 +27,7 @@ export function useAppBootstrap() {
     const updateClientConfig = (nextConfig: Record<string, unknown>) => {
       sessionStorage.setItem("config", JSON.stringify(nextConfig));
       setConfig(new ConfigWrapper(nextConfig, defaultClientConfig));
+      applyAppearanceConfig(nextConfig);
       applyThemeColor(typeof nextConfig["theme.color"] === "string" ? nextConfig["theme.color"] : undefined);
     };
 
@@ -50,6 +52,7 @@ export function useAppBootstrap() {
     } else if (cachedConfig) {
       const configObject = JSON.parse(cachedConfig) as Record<string, unknown>;
       setConfig(new ConfigWrapper(configObject, defaultClientConfig));
+      applyAppearanceConfig(configObject);
       applyThemeColor(typeof configObject["theme.color"] === "string" ? configObject["theme.color"] : undefined);
     }
 

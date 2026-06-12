@@ -478,6 +478,22 @@
         "orange": "Orange"
       }
     },
+    "background_image": {
+      "title": "Site background image",
+      "desc": "Set a page background image by URL, upload, or drag and drop. Leave empty to use the solid background.",
+      "label": "Background image URL",
+      "empty": "No background image"
+    },
+    "font_preset": {
+      "title": "Font preset",
+      "desc": "Choose the font style used across the site and article body",
+      "options": {
+        "default": "Default",
+        "sans": "Modern sans",
+        "serif": "Reading serif",
+        "mono": "Mono code"
+      }
+    },
     "rss": {
       "desc": "Enable RSS subscription link at the site footer",
       "title": "RSS Subscription Link"

@@ -35,6 +35,17 @@ bun run test:server       # Run server tests only
  bun run test:coverage     # Run tests with coverage report
 ```
 
+## Cloudflare GitHub Actions Deployment
+
+本项目可以在本机未安装 Bun 的情况下更新到 Cloudflare，前提是走 GitHub Actions 部署链路。
+
+- 本地只需要提交并推送到 GitHub 仓库；GitHub Actions 的 runner 会通过 `oven-sh/setup-bun@v1` 自动安装 Bun。
+- 推送到 `main` / `master` / `trunk` 会触发 `Build` 工作流；构建成功后会触发 `Deploy` 工作流，将前端部署到 Cloudflare Pages、后端部署到 Cloudflare Workers。
+- 如果推送后没有自动运行，可以进入仓库的 **Actions** 页面，手动运行 **Build** 工作流，分支选择当前生产分支。
+- 本机没有 `bun` 时，不要把 `bun: not recognized` 误判为无法部署；这只表示不能在本机执行 Rin CLI，本次更新仍可通过 GitHub Actions 完成。
+- 只有在需要本地预览、类型检查、测试或手动执行 `bun run deploy` 时，才必须在本机安装 Bun。
+- Cloudflare 相关密钥应配置在 GitHub Secrets / Variables 或 Cloudflare 控制台中，不要把本地 `.env` 作为部署参考上下文或提交到仓库。
+
 ## Rin CLI
 
 The project uses a unified CLI tool located at `cli/bin/rin.ts`. Command implementations live under `cli/src/{commands,tasks,lib}`.

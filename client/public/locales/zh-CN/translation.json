@@ -478,6 +478,22 @@
         "orange": "橙色"
       }
     },
+    "background_image": {
+      "title": "站点背景图",
+      "desc": "设置页面背景图，支持填写 URL、上传图片或拖拽上传；留空则使用纯色背景",
+      "label": "背景图 URL",
+      "empty": "未设置背景图"
+    },
+    "font_preset": {
+      "title": "字体方案",
+      "desc": "选择全站和文章正文使用的字体风格",
+      "options": {
+        "default": "默认",
+        "sans": "现代无衬线",
+        "serif": "阅读衬线",
+        "mono": "等宽代码风"
+      }
+    },
     "rss": {
       "desc": "启用站点底部 RSS 订阅链接",
       "title": "RSS 订阅链接"

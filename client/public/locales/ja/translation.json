@@ -469,6 +469,22 @@
         "orange": "オレンジ"
       }
     },
+    "background_image": {
+      "title": "サイト背景画像",
+      "desc": "URL、アップロード、ドラッグ&ドロップでページ背景画像を設定します。空欄の場合は単色背景を使います。",
+      "label": "背景画像 URL",
+      "empty": "背景画像なし"
+    },
+    "font_preset": {
+      "title": "フォント設定",
+      "desc": "サイト全体と記事本文で使うフォントの雰囲気を選びます",
+      "options": {
+        "default": "標準",
+        "sans": "モダン Sans",
+        "serif": "読み物 Serif",
+        "mono": "等幅コード風"
+      }
+    },
     "rss": {
       "desc": "サイトフッターにRSS購読リンクを有効にする",
       "title": "RSS 購読リンク"
