@@ -125,7 +125,7 @@ export function Markdown({ content }: { content: string }) {
 
   const Content = useMemo(() => (
     <ReactMarkdown
-      className="toc-content dark:text-neutral-300"
+      className="toc-content break-words"
       remarkPlugins={[gfm, remarkMermaid, remarkMath, remarkAlert]}
       children={content}
       rehypePlugins={[rehypeKatex, rehypeRaw]}
@@ -199,7 +199,7 @@ export function Markdown({ content }: { content: string }) {
               <div className="relative group">
                 <SyntaxHighlighter
                   PreTag="div"
-                  className="rounded"
+                  className="rounded-xl border border-black/5 dark:border-white/10"
                   language={language}
                   style={
                     colorMode === "dark"
@@ -211,7 +211,7 @@ export function Markdown({ content }: { content: string }) {
                 >
                   {String(children).replace(/\n$/, "")}
                 </SyntaxHighlighter>
-                <button className="absolute top-1 right-1 px-2 py-1 bg-w rounded-md text-sm bg-hover select-none invisible group-hover:visible"
+                <button className="invisible absolute right-2 top-2 select-none rounded-lg border border-black/5 bg-white/90 px-2 py-1 text-xs font-medium text-neutral-600 shadow-sm backdrop-blur transition-colors hover:text-theme group-hover:visible dark:border-white/10 dark:bg-neutral-900/90 dark:text-neutral-300"
                   onClick={() => {
                     navigator.clipboard.writeText(String(children));
                     setCopied(true);
@@ -226,7 +226,7 @@ export function Markdown({ content }: { content: string }) {
             return (
               <code
                 {...rest}
-                className={`bg-[#eff1f3] dark:bg-[#4a5061] h-[24px] px-[4px] rounded-md mx-[2px] py-[2px] text-neutral-800 dark:text-neutral-300 ${className || ""
+                className={`mx-[2px] rounded-md border border-theme/10 bg-theme/5 px-[4px] py-[2px] text-theme dark:border-theme/20 dark:bg-theme/10 ${className || ""
                   }`}
                 style={inlineCodeStyle}
               >
@@ -238,7 +238,7 @@ export function Markdown({ content }: { content: string }) {
         blockquote({ children, ...props }) {
           return (
             <blockquote
-              className="border-l-4 border-gray-300 dark:border-gray-500 pl-4 italic text-gray-500 dark:text-gray-400"
+              className="my-4 rounded-r-xl border-l-4 border-theme/40 bg-theme/5 py-3 pl-4 pr-3 italic text-neutral-600 dark:bg-theme/10 dark:text-neutral-300"
               {...props}
             >
               {children}
@@ -263,7 +263,7 @@ export function Markdown({ content }: { content: string }) {
         ul({ children, className, ...props }) {
           const listClass = className?.includes("contains-task-list")
             ? "list-none pl-5"
-            : "list-disc pl-5 mt-2";
+            : "mt-3 list-disc pl-5";
           return (
             <ul className={listClass} {...props}>
               {children}
@@ -279,7 +279,7 @@ export function Markdown({ content }: { content: string }) {
         },
         li({ children, ...props }) {
           return (
-            <li className="pl-2 py-1" {...props}>
+            <li className="py-1 pl-2 leading-7" {...props}>
               {children}
             </li>
           );
@@ -287,7 +287,7 @@ export function Markdown({ content }: { content: string }) {
         a({ children, ...props }) {
           return (
             <a
-              className="text-[#0686c8] dark:text-[#2590f1] hover:underline"
+              className="font-medium text-theme underline-offset-4 hover:underline"
               {...props}
             >
               {children}
@@ -299,7 +299,7 @@ export function Markdown({ content }: { content: string }) {
             <h1
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-3xl font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-8 text-3xl font-semibold leading-tight text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -311,7 +311,7 @@ export function Markdown({ content }: { content: string }) {
             <h2
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-2xl font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-8 text-2xl font-semibold leading-tight text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -323,7 +323,7 @@ export function Markdown({ content }: { content: string }) {
             <h3
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-xl font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-6 text-xl font-semibold leading-snug text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -335,7 +335,7 @@ export function Markdown({ content }: { content: string }) {
             <h4
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-lg font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-6 text-lg font-semibold leading-snug text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -347,7 +347,7 @@ export function Markdown({ content }: { content: string }) {
             <h5
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-base font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-5 text-base font-semibold leading-snug text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -359,7 +359,7 @@ export function Markdown({ content }: { content: string }) {
             <h6
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} text-sm font-bold mt-4`.trim()}
+              className={`${props.className || ""} mt-5 text-sm font-semibold uppercase tracking-[0.12em] text-neutral-600 dark:text-neutral-300`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -368,13 +368,13 @@ export function Markdown({ content }: { content: string }) {
         },
         p({ children, node, ...props }) {
           return (
-            <p className="mt-2 py-1" {...props}>
+            <p className="mt-3 py-1 leading-8" {...props}>
               {children}
             </p>
           );
         },
         hr({ children, ...props }) {
-          return <hr className="my-4" {...props} />;
+          return <hr className="my-6 border-black/5 dark:border-white/10" {...props} />;
         },
         table: ({ node, ...props }) => <table className="table" {...props} />,
         th: ({ node, ...props }) => (

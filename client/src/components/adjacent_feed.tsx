@@ -20,7 +20,7 @@ export function AdjacentSection({id, setError}: { id: string, setError: (error: 
             });
     }, [id, setError]);
     return (
-        <div className="rounded-2xl bg-w m-2 grid grid-cols-1 sm:grid-cols-2">
+        <div className="blog-surface m-2 grid grid-cols-1 overflow-hidden rounded-2xl sm:grid-cols-2">
             <AdjacentCard data={adjacentFeeds?.previousFeed} type="previous"/>
             <AdjacentCard data={adjacentFeeds?.nextFeed} type="next"/>
         </div>
@@ -33,29 +33,29 @@ export function AdjacentCard({data, type}: { data: AdjacentFeed | null | undefin
     const {t} = useTranslation()
     if (!data) {
         return (<div className="w-full p-6 duration-300">
-            <p className={`t-secondary w-full ${direction}`}>
+            <p className={`w-full text-sm font-medium text-neutral-500 dark:text-neutral-400 ${direction}`}>
                 {type === "previous" ? "Previous" : "Next"}
             </p>
-            <h1 className={`text-xl text-gray-700 dark:text-white text-pretty truncate ${direction}`}>
+            <h1 className={`mt-1 truncate text-pretty text-lg text-neutral-700 dark:text-white ${direction}`}>
                 {t('no_more')}
             </h1>
         </div>);
     }
     return (
         <Link href={`/feed/${data.id}`} target="_blank"
-              className={`w-full p-6 duration-300 bg-button ${radius}`}>
-            <p className={`t-secondary w-full ${direction}`}>
+              className={`w-full p-6 transition-all duration-200 hover:bg-theme/5 hover:text-theme ${radius}`}>
+            <p className={`w-full text-sm font-medium text-neutral-500 dark:text-neutral-400 ${direction}`}>
                 {type === "previous" ? "Previous" : "Next"}
             </p>
-            <h1 className={`text-xl font-bold text-gray-700 dark:text-white text-pretty truncate ${direction}`}>
+            <h1 className={`mt-1 truncate text-pretty text-xl font-semibold text-neutral-900 dark:text-white ${direction}`}>
                 {data.title}
             </h1>
-            <p className={`space-x-2 ${direction}`}>
-                <span className="text-gray-400 text-sm" title={new Date(data.createdAt).toLocaleString()}>
+            <p className={`mt-2 space-x-2 ${direction}`}>
+                <span className="text-sm text-neutral-500 dark:text-neutral-400" title={new Date(data.createdAt).toLocaleString()}>
                     {data.createdAt === data.updatedAt ? timeago(data.createdAt) : t('feed_card.published$time', {time: timeago(data.createdAt)})}
                 </span>
                 {data.createdAt !== data.updatedAt &&
-                    <span className="text-gray-400 text-sm" title={new Date(data.updatedAt).toLocaleString()}>
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400" title={new Date(data.updatedAt).toLocaleString()}>
                         {t('feed_card.updated$time', {time: timeago(data.updatedAt)})}
                     </span>
                 }

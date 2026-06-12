@@ -44,7 +44,7 @@ const WEBHOOK_METHOD_OPTIONS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD",
 const THEME_COLOR_OPTIONS = [
   { label: "Rose", value: "#fc466b" },
   { label: "Violet", value: "#7c3aed" },
-  { label: "Blue", value: "#2563eb" },
+  { label: "Blue", value: "#4f46e5" },
   { label: "Teal", value: "#0f766e" },
   { label: "Orange", value: "#ea580c" },
 ];
@@ -97,7 +97,7 @@ export function Settings() {
   const { clientConfig, serverConfig } = useMemo(() => createSettingsConfigWrappers(draft), [draft]);
   const aiValue = useMemo(() => buildAIConfigDraftValue(draft, hasStoredAiApiKey), [draft, hasStoredAiApiKey]);
   const hasUnsavedChanges = !areSettingsDraftsEqual(draft, initialDraft);
-  const themeColorValue = normalizeThemeColor(String(clientConfig.get("theme.color") ?? "#fc466b"));
+  const themeColorValue = normalizeThemeColor(String(clientConfig.get("theme.color") ?? "#4f46e5"));
   const feedLayoutValue = normalizeFeedLayout(String(clientConfig.get("feed.layout") ?? "list"));
   const feedCardVariantValue = normalizeFeedCardVariant(String(clientConfig.get("feed.card_variant") ?? "default"));
   const previewSiteName = String(clientConfig.get("site.name") ?? clientConfig.default("site.name") ?? "Rin");

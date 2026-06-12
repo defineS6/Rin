@@ -6,6 +6,7 @@ import { Waiting } from "../components/loading"
 import { client } from "../app/runtime"
 
 import { useSiteConfig } from "../hooks/useSiteConfig";
+import { getFeedListClass } from "../components/feed-layout-options"
 import { siteName } from "../utils/constants"
 
 
@@ -38,7 +39,7 @@ export function HashtagPage({ name }: { name: string }) {
     const siteConfig = useSiteConfig();
     const [status, setStatus] = useState<'loading' | 'idle'>('idle')
     const [hashtag, setHashtag] = useState<FeedsData>()
-    const feedListClass = siteConfig.feedLayout === "masonry" ? "wauto columns-1 gap-5 md:columns-2" : "wauto flex flex-col";
+    const feedListClass = getFeedListClass(siteConfig.feedLayout);
     const ref = useRef("")
     function fetchFeeds() {
         const nameDecoded = decodeURI(name)
@@ -67,12 +68,12 @@ export function HashtagPage({ name }: { name: string }) {
             </Helmet>
             <Waiting for={hashtag || status === 'idle'}>
                 <main className="w-full flex flex-col justify-center items-center mb-8">
-                    <div className="wauto text-start text-black dark:text-white py-4 text-4xl font-bold">
-                        <p>
+                    <div className="blog-page-header">
+                        <p className="text-3xl font-semibold tracking-tight md:text-4xl">
                             {hashtag?.name}
                         </p>
-                        <div className="flex flex-row justify-between">
-                            <p className="text-sm mt-4 text-neutral-500 font-normal">
+                        <div className="mt-3 flex flex-row justify-between">
+                            <p className="text-sm font-normal text-neutral-500 dark:text-neutral-400">
                                 {t('article.total$count', { count: hashtag?.feeds?.length })}
                             </p>
                         </div>

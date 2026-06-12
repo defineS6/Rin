@@ -1,9 +1,9 @@
 @import "./base.css";
 
 :root {
-  --theme-rgb: 252 70 107;
-  --theme-hover-rgb: 177 48 73;
-  --theme-active-rgb: 151 32 56;
+  --theme-rgb: 79 70 229;
+  --theme-hover-rgb: 55 49 160;
+  --theme-active-rgb: 47 42 137;
 }
 
 /* cantarell-latin-400-normal */
@@ -31,6 +31,10 @@ textarea:focus {
 .wmde-markdown {
   @apply bg-w;
   font-family: Cantarell, "Source Han Serif CN VF" !important;
+}
+
+.toc-content {
+  @apply text-[15px] leading-8 text-neutral-700 dark:text-neutral-300;
 }
 
 .w-md-editor {
@@ -123,16 +127,42 @@ ul {
   }
 }
 
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .popup-content {
   animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
 }
 
 .ani-show {
-  animation: anvil 0.5s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  animation: fadeInUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .ani-show-fast {
-  animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  animation: fadeInUp 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ani-show,
+  .ani-show-fast {
+    animation-duration: 0.01ms !important;
+    transform: none !important;
+  }
+
+  .blog-interactive,
+  .blog-interactive:hover {
+    transform: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .table {
@@ -175,6 +205,11 @@ a.toc-link {
   height: 100%;
   width: 100%;
   display: block;
+  transition: color 160ms ease;
+}
+
+a.toc-link:hover {
+  @apply text-theme;
 }
 
 .is-collapsible {
@@ -197,7 +232,6 @@ a.toc-link {
 }
 
 .toc-link::before {
-  background-color: #eee;
   content: " ";
   display: inline-block;
   height: inherit;
@@ -205,6 +239,7 @@ a.toc-link {
   margin-top: -1px;
   position: absolute;
   width: 2px;
+  @apply bg-neutral-200 dark:bg-white/10;
 }
 
 .is-active-link::before {

@@ -7,6 +7,7 @@ import { Waiting } from "../components/loading"
 import { client } from "../app/runtime"
 
 import { useSiteConfig } from "../hooks/useSiteConfig";
+import { getFeedListClass } from "../components/feed-layout-options"
 import { siteName } from "../utils/constants"
 import { tryInt } from "../utils/int"
 
@@ -24,7 +25,7 @@ export function SearchPage({ keyword }: { keyword: string }) {
     const [feeds, setFeeds] = useState<FeedsData>()
     const page = tryInt(1, query.get("page"))
     const limit = tryInt(siteConfig.pageSize, query.get("limit"))
-    const feedListClass = siteConfig.feedLayout === "masonry" ? "wauto columns-1 gap-5 md:columns-2" : "wauto flex flex-col";
+    const feedListClass = getFeedListClass(siteConfig.feedLayout);
     const ref = useRef("")
     function fetchFeeds() {
         if (!keyword) return
@@ -58,12 +59,12 @@ export function SearchPage({ keyword }: { keyword: string }) {
             </Helmet>
             <Waiting for={status === 'idle'}>
                 <main className="w-full flex flex-col justify-center items-center mb-8">
-                    <div className="wauto text-start text-black dark:text-white py-4 text-4xl font-bold">
-                        <p>
+                    <div className="blog-page-header">
+                        <p className="text-3xl font-semibold tracking-tight md:text-4xl">
                             {t('article.search.title')}
                         </p>
-                        <div className="flex flex-row justify-between">
-                            <p className="text-sm mt-4 text-neutral-500 font-normal">
+                        <div className="mt-3 flex flex-row justify-between">
+                            <p className="text-sm font-normal text-neutral-500 dark:text-neutral-400">
                                 {t('article.total$count', { count: feeds?.size })}
                             </p>
                         </div>
@@ -74,17 +75,17 @@ export function SearchPage({ keyword }: { keyword: string }) {
                                 <FeedCard key={id} id={id} {...feed} />
                             ))}
                         </div>
-                        <div className="wauto flex flex-row items-center mt-4 ani-show">
+                        <div className="mt-5 flex w-full max-w-5xl flex-row items-center ani-show md:w-11/12 lg:w-10/12 xl:w-8/12 2xl:w-7/12">
                             {page > 1 &&
                                 <Link href={`?page=${(page - 1)}&limit=${limit}`}
-                                    className={`text-sm font-normal rounded-full px-4 py-2 text-white bg-theme`}>
+                                    className="blog-primary-button">
                                     {t('previous')}
                                 </Link>
                             }
                             <div className="flex-1" />
                             {feeds?.hasNext &&
                                 <Link href={`?page=${(page + 1)}&limit=${limit}`}
-                                    className={`text-sm font-normal rounded-full px-4 py-2 text-white bg-theme`}>
+                                    className="blog-primary-button">
                                     {t('next')}
                                 </Link>
                             }

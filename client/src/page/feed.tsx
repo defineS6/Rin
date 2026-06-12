@@ -166,7 +166,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
       <div className="w-full flex flex-row justify-center ani-show">
         {error && (
           <>
-            <div className="flex flex-col wauto rounded-2xl bg-w m-2 p-6 items-center justify-center space-y-2">
+            <div className="blog-surface flex flex-col wauto rounded-2xl m-2 p-6 items-center justify-center space-y-2">
               <h1 className="text-xl font-bold t-primary">{error}</h1>
               {error === "Not found" && id === "about" && (
                 <Tips value={t("about.notfound")} />
@@ -183,14 +183,14 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
             <div className="xl:w-64" />
             <main className="wauto">
               <article
-                className="rounded-2xl bg-w m-2 px-6 py-4"
+                className="blog-surface m-2 rounded-2xl px-5 py-5 md:px-7 md:py-6"
                 aria-label={feed.title ?? "Unnamed"}
               >
-                <div className="flex justify-between">
-                  <div>
-                    <div className="mt-1 mb-1 flex gap-1">
+                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1">
                       <p
-                        className="text-gray-400 text-[12px]"
+                        className="text-xs font-medium text-neutral-500 dark:text-neutral-400"
                         title={new Date(feed.createdAt).toLocaleString()}
                       >
                         {t("feed_card.published$time", {
@@ -200,7 +200,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
 
                       {feed.createdAt !== feed.updatedAt && (
                         <p
-                          className="text-gray-400 text-[12px]"
+                          className="text-xs font-medium text-neutral-500 dark:text-neutral-400"
                           title={new Date(feed.updatedAt).toLocaleString()}
                         >
                           {t("feed_card.updated$time", {
@@ -209,7 +209,7 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                         </p>
                       )}
                     </div>
-                    {counterEnabled && <p className='text-[12px] text-gray-400 font-normal link-line'>
+                    {counterEnabled && <p className='mt-1 text-xs font-normal text-neutral-500 dark:text-neutral-400 link-line'>
                       <span> {t("count.pv")} </span>
                       <span>
                         {feed.pv}
@@ -220,34 +220,34 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                         {feed.uv}
                       </span>
                     </p>}
-                    <div className="flex flex-row items-center">
-                      <h1 className="text-2xl font-bold t-primary break-all">
+                    <div className="mt-3 flex flex-row items-center">
+                      <h1 className="break-words text-3xl font-semibold leading-tight text-neutral-900 dark:text-white">
                         {feed.title}
                       </h1>
                       <div className="flex-1 w-0" />
                     </div>
                   </div>
-                  <div className="pt-2">
+                  <div className="shrink-0 sm:pt-2">
                     {profile?.permission && (
                       <div className="flex gap-2">
                         <button
                           aria-label={top > 0 ? t("untop.title") : t("top.title")}
                           onClick={topFeed}
-                          className={`flex-1 flex flex-col items-end justify-center px-2 py rounded-full transition ${top > 0 ? "bg-theme text-white hover:bg-theme-hover active:bg-theme-active" : "bg-secondary bg-button dark:text-neutral-400"}`}
+                          className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${top > 0 ? "border-theme bg-theme text-white hover:bg-theme-hover active:bg-theme-active" : "border-black/10 bg-white text-neutral-500 hover:border-theme/30 hover:text-theme dark:border-white/10 dark:bg-white/5 dark:text-neutral-400"}`}
                         >
                           <i className="ri-skip-up-line" />
                         </button>
                         <Link
                           aria-label={t("edit")}
                           href={`/admin/writing/${feed.id}`}
-                          className="flex-1 flex flex-col items-end justify-center px-2 py bg-secondary bg-button rounded-full transition"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-neutral-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-theme/30 hover:text-theme active:translate-y-0 dark:border-white/10 dark:bg-white/5 dark:text-neutral-400"
                         >
                           <i className="ri-edit-2-line dark:text-neutral-400" />
                         </Link>
                         <button
                           aria-label={t("delete.title")}
                           onClick={deleteFeed}
-                          className="flex-1 flex flex-col items-end justify-center px-2 py bg-secondary bg-button rounded-full transition"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-neutral-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-rose-200 hover:text-rose-500 active:translate-y-0 dark:border-white/10 dark:bg-white/5 dark:text-neutral-400 dark:hover:border-rose-500/40"
                         >
                           <i className="ri-delete-bin-7-line text-red-500" />
                         </button>
@@ -256,21 +256,21 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                   </div>
                 </div>
                 {(hasAISummary || showAISummaryState) && (
-                  <div className="my-4 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-100 dark:border-purple-800/30">
+                  <div className="my-5 rounded-2xl border border-theme/15 bg-theme/5 p-4 dark:border-theme/25 dark:bg-theme/10">
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
-                        <i className="ri-sparkling-2-fill text-purple-500" />
-                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                        <i className="ri-sparkling-2-fill text-theme" />
+                        <span className="text-sm font-medium text-theme">
                           {t('ai_summary.title')}
                         </span>
                       </div>
                       {showAISummaryState ? (
-                        <span className="rounded-full bg-white/70 px-2 py-1 text-xs font-medium text-purple-700 dark:bg-white/10 dark:text-purple-300">
+                        <span className="rounded-full bg-white/80 px-2 py-1 text-xs font-medium text-theme ring-1 ring-theme/10 dark:bg-white/10">
                           {t(`ai_summary.status.${feed.ai_summary_status}`)}
                         </span>
                       ) : null}
                     </div>
-                    <p className="text-sm t-secondary leading-relaxed whitespace-pre-wrap">
+                    <p className="whitespace-pre-wrap text-sm leading-7 text-neutral-600 dark:text-neutral-300">
                       {hasAISummary ? feed.ai_summary : t(`ai_summary.message.${feed.ai_summary_status}`)}
                     </p>
                     {feed.ai_summary_status === "failed" && feed.ai_summary_error ? (
@@ -281,9 +281,9 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                   </div>
                 )}
                 <Markdown content={feed.content} />
-                <div className="mt-6 flex flex-col gap-2">
+                <div className="mt-8 flex flex-col gap-3 border-t border-black/5 pt-5 dark:border-white/10">
                   {feed.hashtags.length > 0 && (
-                    <div className="flex flex-row flex-wrap gap-x-2">
+                    <div className="flex flex-row flex-wrap gap-2">
                       {feed.hashtags.map(({ name }, index) => (
                         <HashTag key={index} name={name} />
                       ))}
@@ -292,10 +292,10 @@ export function FeedPage({ id, TOC, clean }: { id: string, TOC: () => JSX.Elemen
                   <div className="flex flex-row items-center">
                     <img
                       src={feed.user.avatar || "/avatar.png"}
-                      className="w-8 h-8 rounded-full"
+                      className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10"
                     />
                     <div className="ml-2">
-                      <span className="text-gray-400 text-sm cursor-default">
+                      <span className="cursor-default text-sm text-neutral-500 dark:text-neutral-400">
                         {feed.user.username}
                       </span>
                     </div>
@@ -405,20 +405,20 @@ function CommentInput({
       });
   }
   return (
-    <div className="w-full rounded-2xl bg-w t-primary p-6 items-end flex flex-col">
+    <div className="blog-surface flex w-full flex-col items-end rounded-2xl p-6 t-primary">
       <div className="flex flex-col w-full items-start mb-4">
-        <label htmlFor="comment">{t("comment.title")}</label>
+        <label htmlFor="comment" className="text-sm font-semibold text-neutral-900 dark:text-white">{t("comment.title")}</label>
       </div>
       {profile ? (<>
         <textarea
           id="comment"
           placeholder={t("comment.placeholder.title")}
-          className="bg-w w-full h-24 rounded-lg"
+          className="h-24 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm t-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-theme/40 focus:ring-2 focus:ring-theme/10 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-neutral-500"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
         <button
-          className="mt-4 bg-theme text-white px-4 py-2 rounded-full"
+          className="blog-primary-button mt-4"
           onClick={submit}
         >
           {t("comment.submit")}
@@ -426,7 +426,7 @@ function CommentInput({
       </>      ) : (
         <div className="flex flex-row w-full items-center justify-center space-x-2 py-12">
           <button
-            className="mt-2 bg-theme text-white px-4 py-2 rounded-full"
+            className="blog-primary-button mt-2"
             onClick={() => setLocation('/login')}
           >
             {t("login.required")}
@@ -482,10 +482,10 @@ function Comments({ id }: { id: string }) {
           <CommentInput id={id} onRefresh={loadComments} />
           {error && (
             <>
-              <div className="flex flex-col wauto rounded-2xl bg-w t-primary m-2 p-6 items-center justify-center">
+              <div className="blog-surface flex flex-col wauto rounded-2xl t-primary m-2 p-6 items-center justify-center">
                 <h1 className="text-xl font-bold t-primary">{error}</h1>
                 <button
-                  className="mt-2 bg-theme text-white px-4 py-2 rounded-full"
+                  className="blog-primary-button mt-2"
                   onClick={loadComments}
                 >
                   {t("reload")}
@@ -543,28 +543,28 @@ function CommentItem({
     <div className="flex flex-row items-start rounded-xl mt-2">
       <img
         src={comment.user.avatar || ""}
-        className="w-8 h-8 rounded-full mt-4"
+        className="mt-4 h-8 w-8 rounded-full border border-black/5 dark:border-white/10"
       />
-      <div className="flex flex-col flex-1 w-0 ml-2 bg-w rounded-xl p-4">
+      <div className="blog-surface ml-2 flex flex-1 w-0 flex-col rounded-xl p-4">
         <div className="flex flex-row">
-          <span className="t-primary text-base font-bold">
+          <span className="text-base font-semibold text-neutral-900 dark:text-white">
             {comment.user.username}
           </span>
           <div className="flex-1 w-0" />
           <span
             title={new Date(comment.createdAt).toLocaleString()}
-            className="text-gray-400 text-sm"
+            className="text-sm text-neutral-500 dark:text-neutral-400"
           >
             {timeago(comment.createdAt)}
           </span>
         </div>
-        <p className="t-primary break-words">{comment.content}</p>
+        <p className="mt-2 break-words text-sm leading-7 text-neutral-700 dark:text-neutral-300">{comment.content}</p>
         <div className="flex flex-row justify-end">
           {(profile?.permission || profile?.id == comment.user.id) && (
             <Popup
               arrow={false}
               trigger={
-                <button className="px-2 py bg-secondary rounded-full">
+                <button className="rounded-full border border-black/10 bg-white px-2 py-1 transition-colors hover:text-theme dark:border-white/10 dark:bg-white/5">
                   <i className="ri-more-fill t-secondary"></i>
                 </button>
               }
@@ -574,7 +574,7 @@ function CommentItem({
                 <button
                   onClick={deleteComment}
                   aria-label={t("delete.comment.title")}
-                  className="px-2 py bg-secondary rounded-full"
+                  className="rounded-full border border-black/10 bg-white px-2 py-1 transition-colors hover:text-rose-500 dark:border-white/10 dark:bg-white/5"
                 >
                   <i className="ri-delete-bin-2-line t-secondary"></i>
                 </button>
