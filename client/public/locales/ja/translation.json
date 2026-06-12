@@ -482,7 +482,9 @@
         "default": "標準",
         "sans": "モダン Sans",
         "serif": "読み物 Serif",
-        "mono": "等幅コード風"
+        "mono": "等幅コード風",
+        "lxgw-wenkai": "霞鶩文楷",
+        "rounded": "丸ゴシック"
       }
     },
     "rss": {

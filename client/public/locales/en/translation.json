@@ -491,7 +491,9 @@
         "default": "Default",
         "sans": "Modern sans",
         "serif": "Reading serif",
-        "mono": "Mono code"
+        "mono": "Mono code",
+        "lxgw-wenkai": "LXGW WenKai",
+        "rounded": "Rounded"
       }
     },
     "rss": {

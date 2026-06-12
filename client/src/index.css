@@ -21,6 +21,14 @@
     U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  font-family: "Rin OpenHuninn";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/openhuninn/jf-openhuninn-2.0.ttf") format("truetype");
+}
+
 body {
   @apply bg-background-light dark:bg-background-dark text-gray-800;
   background-image:

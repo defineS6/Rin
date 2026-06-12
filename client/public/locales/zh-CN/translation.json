@@ -491,7 +491,9 @@
         "default": "默认",
         "sans": "现代无衬线",
         "serif": "阅读衬线",
-        "mono": "等宽代码风"
+        "mono": "等宽代码风",
+        "lxgw-wenkai": "霞鹜文楷",
+        "rounded": "圆体"
       }
     },
     "rss": {
