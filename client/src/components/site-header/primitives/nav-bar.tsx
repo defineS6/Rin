@@ -20,6 +20,7 @@ export function NavBar({
       <NavItem menu={menu} onClick={onClick} itemClassName={itemClassName} title={t("moments.title")} selected={location === "/moments"} href="/moments" />
       <NavItem menu={menu} onClick={onClick} itemClassName={itemClassName} title={t("hashtags")} selected={location === "/hashtags"} href="/hashtags" />
       <NavItem menu={menu} onClick={onClick} itemClassName={itemClassName} title={t("friends.title")} selected={location === "/friends"} href="/friends" />
+      <NavItem menu={menu} onClick={onClick} itemClassName={itemClassName} title={t("travellings")} selected={false} href="https://www.travellings.cn/go.html" external />
       <NavItem menu={menu} onClick={onClick} itemClassName={itemClassName} title={t("about.title")} selected={location === "/about"} href="/about" />
     </>
   );
@@ -33,6 +34,7 @@ function NavItem({
   when = true,
   onClick,
   itemClassName = "",
+  external = false,
 }: {
   title: string;
   selected: boolean;
@@ -41,17 +43,35 @@ function NavItem({
   when?: boolean;
   onClick?: () => void;
   itemClassName?: string;
+  external?: boolean;
 }) {
-  return when ? (
+  if (!when) {
+    return null;
+  }
+
+  const className = `${menu ? "" : "hidden"} md:block cursor-pointer hover:text-theme duration-300 px-2 py-4 md:p-4 text-sm ${
+    selected ? "text-theme" : "dark:text-white"
+  } ${itemClassName}`;
+
+  return external ? (
+    <a
+      href={href}
+      className={className}
+      target="_blank"
+      rel="noopener noreferrer"
+      title="开往 - 友链接力"
+      onClick={onClick}
+    >
+      {title}
+    </a>
+  ) : (
     <Link
       href={href}
-      className={`${menu ? "" : "hidden"} md:block cursor-pointer hover:text-theme duration-300 px-2 py-4 md:p-4 text-sm ${
-        selected ? "text-theme" : "dark:text-white"
-      } ${itemClassName}`}
+      className={className}
       state={{ animate: true }}
       onClick={onClick}
     >
       {title}
     </Link>
-  ) : null;
+  );
 }
