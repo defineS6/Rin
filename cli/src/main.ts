@@ -3,6 +3,7 @@ import { runDbCommand } from "./commands/db";
 import { runDeployCommand } from "./commands/deploy";
 import { runDevCommand } from "./commands/dev";
 import { runReleaseCommand } from "./commands/release";
+import { runSyncCommand } from "./commands/sync";
 import { runSetupDev } from "./tasks/setup-dev";
 import { runSeoRender } from "./tasks/seo-render";
 
@@ -17,6 +18,7 @@ Commands:
   setup-dev
   release <version>
   seo-render
+  sync init|status|pull|push|run
 `);
 }
 
@@ -48,6 +50,9 @@ export async function runCli(rawArgs: string[]) {
       return;
     case "release":
       await runReleaseCommand(cmdArgs);
+      return;
+    case "sync":
+      await runSyncCommand(cmdArgs);
       return;
     case "setup-dev":
       await runSetupDev();

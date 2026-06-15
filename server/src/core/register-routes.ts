@@ -9,6 +9,7 @@ import { MomentsService } from "../services/moments";
 import { RSSService } from "../services/rss";
 import { BlobService, StorageService } from "../services/storage";
 import { TagService } from "../services/tag";
+import { SyncService } from "../services/sync";
 import { UserService } from "../services/user";
 
 export function registerRoutes(app: RinApp) {
@@ -16,6 +17,7 @@ export function registerRoutes(app: RinApp) {
 
   app.route("/feed", FeedService());
   app.route("/search", SearchService());
+  app.route("/sync", SyncService());
   app.route("/wp", WordPressService());
   app.route("/tag", TagService());
   app.route("/comment", CommentService());

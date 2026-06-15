@@ -7,10 +7,12 @@
     "rin": "./bin/rin.ts"
   },
   "scripts": {
+    "build:sync": "bun scripts/build-sync-binaries.ts",
     "check": "tsc --noEmit",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@rin/api": "workspace:*",
     "@aws-sdk/client-s3": "^3.930.0",
     "puppeteer": "^24.7.1",
     "strip-indent": "^4.0.0"

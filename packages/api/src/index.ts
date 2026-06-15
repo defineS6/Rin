@@ -3,6 +3,7 @@
 
 // Types
 export * from './types';
+export * from './sync';
 
 // Schemas for server-side validation
 export * from './schemas';
