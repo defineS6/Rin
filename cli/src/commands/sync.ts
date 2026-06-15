@@ -4,6 +4,10 @@ import { fetchCapabilities, initializeSync, loadSyncFiles, localStatus, pullArti
 
 export async function runSyncCommand(args: string[]) {
   const [subcommand = "status"] = args;
+  if (subcommand === "--help" || subcommand === "-h" || subcommand === "help") {
+    printSyncHelp();
+    return;
+  }
   const { values } = parseArgs({
     args: args.slice(1),
     options: {
@@ -47,5 +51,9 @@ export async function runSyncCommand(args: string[]) {
     return;
   }
 
-  console.log("Sync commands:\n  rin sync init --remote <url> [--dir posts]\n  rin sync status\n  rin sync pull [--dry-run]\n  rin sync push [--dry-run]\n  rin sync run [--dry-run]");
+  printSyncHelp();
+}
+
+function printSyncHelp() {
+  console.log("Sync commands:\n  rin-sync init --remote <url> [--dir posts]\n  rin-sync status\n  rin-sync pull [--dry-run]\n  rin-sync push [--dry-run]\n  rin-sync run [--dry-run]");
 }

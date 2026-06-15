@@ -7,6 +7,7 @@
     "rin": "./bin/rin.ts"
   },
   "scripts": {
+    "build:sync": "bun scripts/build-sync-binaries.ts",
     "check": "tsc --noEmit",
     "typecheck": "tsc --noEmit"
   },

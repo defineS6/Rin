@@ -15,3 +15,16 @@ bun cli/bin/rin.ts sync status
 ```
 
 Configuration and state are stored in `.rin/`; articles are stored in the configured `posts` directory. Supply the token only through `RIN_SYNC_TOKEN`; do not store it in configuration or commit it to Git.
+
+## Standalone executables
+
+Each GitHub Release includes standalone `rin-sync` executables for Linux, macOS, and Windows. Download the archive for your platform and add the executable to `PATH`; Bun is not required:
+
+```bash
+rin-sync init --remote https://blog.example.com --dir posts
+rin-sync pull
+rin-sync push
+rin-sync run
+```
+
+From the repository, enter `cli/` and run `bun run build:sync` to build all platform binaries into `cli/dist/sync/`.

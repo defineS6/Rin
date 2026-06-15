@@ -15,3 +15,16 @@ bun cli/bin/rin.ts sync status
 ```
 
 同步配置与状态保存在 `.rin/`，文章保存在配置的 `posts` 目录。Token 只应通过 `RIN_SYNC_TOKEN` 环境变量提供，不应写入配置或提交到 Git。
+
+## 独立可执行文件
+
+每个版本的 GitHub Release 会附带 `rin-sync` 的 Linux、macOS 和 Windows 独立可执行文件。下载对应平台压缩包并将程序加入 `PATH` 后，无需安装 Bun：
+
+```bash
+rin-sync init --remote https://blog.example.com --dir posts
+rin-sync pull
+rin-sync push
+rin-sync run
+```
+
+在仓库中也可以进入 `cli/` 后执行 `bun run build:sync`，将多平台产物构建到 `cli/dist/sync/`。
