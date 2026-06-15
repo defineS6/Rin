@@ -376,33 +376,67 @@ function CommentInput({
 }) {
   const { t } = useTranslation();
   const [content, setContent] = useState("");
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestWebsite, setGuestWebsite] = useState("");
   const [error, setError] = useState("");
   const { showAlert, AlertUI } = useAlert();
   const profile = useContext(ProfileContext);
   const [, setLocation] = useLocation();
+  const config = useContext(ClientConfigContext);
+  // 默认启用游客评论；管理员可通过客户端配置 `comment.guest.enabled=false` 关闭
+  const rawGuest = config.get('comment.guest.enabled');
+  const guestEnabled = rawGuest !== false && rawGuest !== 'false';
   function errorHumanize(error: string) {
     if (error === "Unauthorized") return t("login.required");
     else if (error === "Content is required") return t("comment.empty");
+    else if (error === "Guest name is required") return t("comment.guest_name_required");
     return error;
   }
   function submit() {
-    if (!profile) {
-      setLocation('/login')
-      return;
+    if (profile) {
+      client.comment
+        .create(parseInt(id), { content })
+        .then(({ error }) => {
+          if (error) {
+            setError(errorHumanize(error.value as string));
+          } else {
+            setContent("");
+            setError("");
+            showAlert(t("comment.success"), () => {
+              onRefresh();
+            });
+          }
+        });
+    } else if (guestEnabled) {
+      if (!guestName.trim()) {
+        setError(t("comment.guest_name_required"));
+        return;
+      }
+      client.comment
+        .create(parseInt(id), {
+          content,
+          guestName: guestName.trim(),
+          guestEmail: guestEmail.trim() || undefined,
+          guestWebsite: guestWebsite.trim() || undefined,
+        })
+        .then(({ error }) => {
+          if (error) {
+            setError(errorHumanize(error.value as string));
+          } else {
+            setContent("");
+            setGuestName("");
+            setGuestEmail("");
+            setGuestWebsite("");
+            setError("");
+            showAlert(t("comment.success"), () => {
+              onRefresh();
+            });
+          }
+        });
+    } else {
+      setLocation('/login');
     }
-    client.comment
-      .create(parseInt(id), { content })
-      .then(({ error }) => {
-        if (error) {
-          setError(errorHumanize(error.value as string));
-        } else {
-          setContent("");
-          setError("");
-          showAlert(t("comment.success"), () => {
-            onRefresh();
-          });
-        }
-      });
   }
   return (
     <div className="blog-surface flex w-full flex-col items-end rounded-2xl p-6 t-primary">
@@ -423,7 +457,42 @@ function CommentInput({
         >
           {t("comment.submit")}
         </button>
-      </>      ) : (
+      </>) : guestEnabled ? (<>
+        <input
+          type="text"
+          placeholder={t("comment.guest_name_placeholder")}
+          className="mb-2 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm t-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-theme/40 focus:ring-2 focus:ring-theme/10 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-neutral-500"
+          value={guestName}
+          onChange={(e) => setGuestName(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder={t("comment.guest_email_placeholder")}
+          className="mb-2 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm t-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-theme/40 focus:ring-2 focus:ring-theme/10 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-neutral-500"
+          value={guestEmail}
+          onChange={(e) => setGuestEmail(e.target.value)}
+        />
+        <input
+          type="url"
+          placeholder={t("comment.guest_website_placeholder")}
+          className="mb-2 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm t-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-theme/40 focus:ring-2 focus:ring-theme/10 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-neutral-500"
+          value={guestWebsite}
+          onChange={(e) => setGuestWebsite(e.target.value)}
+        />
+        <textarea
+          id="comment"
+          placeholder={t("comment.placeholder.title")}
+          className="h-24 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm t-primary outline-none transition-colors placeholder:text-neutral-400 focus:border-theme/40 focus:ring-2 focus:ring-theme/10 dark:border-white/10 dark:bg-white/5 dark:placeholder:text-neutral-500"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+        <button
+          className="blog-primary-button mt-4"
+          onClick={submit}
+        >
+          {t("comment.submit")}
+        </button>
+      </>) : (
         <div className="flex flex-row w-full items-center justify-center space-x-2 py-12">
           <button
             className="blog-primary-button mt-2"
@@ -444,12 +513,15 @@ type Comment = {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  user: {
+  user?: {
     id: number;
     username: string;
     avatar: string | null;
     permission: number | null;
-  };
+  } | null;
+  guestName?: string;
+  guestEmail?: string;
+  guestWebsite?: string;
 };
 
 function Comments({ id }: { id: string }) {
@@ -521,6 +593,8 @@ function CommentItem({
   const { showAlert, AlertUI } = useAlert();
   const { t } = useTranslation();
   const profile = useContext(ProfileContext);
+  const commenterName = comment.user?.username || comment.guestName || t("anonymous");
+  const commenterAvatar = comment.user?.avatar || "/avatar.png";
   function deleteComment() {
     showConfirm(
       t("delete.comment.title"),
@@ -542,14 +616,25 @@ function CommentItem({
   return (
     <div className="flex flex-row items-start rounded-xl mt-2">
       <img
-        src={comment.user.avatar || ""}
+        src={commenterAvatar}
+        alt={commenterName}
         className="mt-4 h-8 w-8 rounded-full border border-black/5 dark:border-white/10"
       />
       <div className="blog-surface ml-2 flex flex-1 w-0 flex-col rounded-xl p-4">
         <div className="flex flex-row">
           <span className="text-base font-semibold text-neutral-900 dark:text-white">
-            {comment.user.username}
+            {commenterName}
           </span>
+          {comment.guestWebsite && (
+            <a
+              href={comment.guestWebsite}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 text-gray-400 hover:text-theme transition-colors"
+            >
+              <i className="ri-external-link-line"></i>
+            </a>
+          )}
           <div className="flex-1 w-0" />
           <span
             title={new Date(comment.createdAt).toLocaleString()}
@@ -560,7 +645,7 @@ function CommentItem({
         </div>
         <p className="mt-2 break-words text-sm leading-7 text-neutral-700 dark:text-neutral-300">{comment.content}</p>
         <div className="flex flex-row justify-end">
-          {(profile?.permission || profile?.id == comment.user.id) && (
+          {(profile?.permission || (comment.user && profile?.id == comment.user.id)) && (
             <Popup
               arrow={false}
               trigger={
