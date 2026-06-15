@@ -1,5 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import type { SyncCapabilities, SyncPullResponse, SyncPushResponse } from "@rin/api";
 import type { Database } from "bun:sqlite";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { cleanupTestDB, createTestUser, setupTestApp } from "../../../tests/fixtures";
 import { SyncService } from "../sync";
 
@@ -23,11 +24,12 @@ describe("SyncService", () => {
     const headers = { Authorization: "Bearer mock_token_1" };
     const capabilities = await app.request("/capabilities", { headers }, env);
     expect(capabilities.status).toBe(200);
-    expect((await capabilities.json()).features.pull).toBe(true);
+    const capabilitiesBody = await capabilities.json() as SyncCapabilities;
+    expect(capabilitiesBody.features.pull).toBe(true);
 
     const response = await app.request("/articles", { headers }, env);
     expect(response.status).toBe(200);
-    const result = await response.json();
+    const result = await response.json() as SyncPullResponse;
     expect(result.items).toHaveLength(1);
     expect(result.items[0]).toMatchObject({ id: 1, title: "Hello", content: "Body", draft: false, listed: true });
   });
@@ -40,7 +42,7 @@ describe("SyncService", () => {
       body: JSON.stringify({ items: [{ title: "Local", content: "Created locally", tags: ["sync"] }] }),
     }, env);
     expect(created.status).toBe(200);
-    const createdBody = await created.json();
+    const createdBody = await created.json() as SyncPushResponse;
     expect(createdBody.items[0]).toMatchObject({ title: "Local", content: "Created locally", tags: ["sync"] });
 
     const updated = await app.request("/articles", {
@@ -49,6 +51,7 @@ describe("SyncService", () => {
       body: JSON.stringify({ items: [{ id: 1, title: "Overwritten", content: "New body" }] }),
     }, env);
     expect(updated.status).toBe(200);
-    expect((await updated.json()).items[0]).toMatchObject({ id: 1, title: "Overwritten", content: "New body" });
+    const updatedBody = await updated.json() as SyncPushResponse;
+    expect(updatedBody.items[0]).toMatchObject({ id: 1, title: "Overwritten", content: "New body" });
   });
 });
