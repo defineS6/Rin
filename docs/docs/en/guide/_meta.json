@@ -4,6 +4,7 @@
   "development",
   "webhook",
   "rss",
+  "sync",
   "migration",
   "changelog",
   "testing",
