@@ -14,6 +14,14 @@ function env(name: string, defaultValue?: string, required = false) {
 
 const renv = (name: string, defaultValue?: string) => env(name, defaultValue, true)!;
 
+export function parseBooleanEnv(value: string | undefined, defaultValue: boolean) {
+  if (value === undefined || value.trim() === "") {
+    return defaultValue;
+  }
+
+  return !["0", "false", "off", "no", "disabled"].includes(value.trim().toLowerCase());
+}
+
 const WORKER_SECRET_KEYS = [
   "JWT_SECRET",
   "ADMIN_USERNAME",
@@ -87,12 +95,19 @@ export function buildR2BucketInfo(r2BucketName: string, accountId: string): R2Bu
   };
 }
 
-export function buildWranglerTriggersConfig(preview = false) {
-  return preview
-    ? ""
-    : stripIndent(`
+export function buildWranglerTriggersConfig(preview = false, scheduledTasksEnabled = true) {
+  if (preview) {
+    return "";
+  }
+
+  return scheduledTasksEnabled
+    ? stripIndent(`
         [triggers]
         crons = ["*/20 * * * *"]
+      `)
+    : stripIndent(`
+        [triggers]
+        crons = []
       `);
 }
 
@@ -162,6 +177,7 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
   const avatar = env("AVATAR", "");
   const pageSize = env("PAGE_SIZE", "5");
   const rssEnable = env("RSS_ENABLE", "false");
+  const scheduledTasksEnabled = parseBooleanEnv(env("SCHEDULED_TASKS_ENABLED", "true"), true);
 
   let finalS3Endpoint = s3Endpoint;
   let finalS3Bucket = s3Bucket;
@@ -194,7 +210,7 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
       [assets]
       directory = "./dist/client"
       binding = "ASSETS"
-      ${buildWranglerTriggersConfig(preview)}
+      ${buildWranglerTriggersConfig(preview, scheduledTasksEnabled)}
       ${buildWranglerObservabilityConfig(preview)}
 
       [vars]
@@ -214,6 +230,7 @@ export async function runCloudflareDeploy(target: "all" | "server" | "client" = 
       AVATAR = "${avatar}"
       PAGE_SIZE = "${pageSize}"
       RSS_ENABLE = "${rssEnable}"
+      SCHEDULED_TASKS_ENABLED = "${scheduledTasksEnabled ? "true" : "false"}"
 
       [placement]
       mode = "smart"

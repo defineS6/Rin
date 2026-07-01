@@ -4,6 +4,7 @@ import {
   buildWranglerQueueConfig,
   buildWranglerTriggersConfig,
   collectWorkerSecrets,
+  parseBooleanEnv,
 } from "./deploy-cf";
 
 describe("collectWorkerSecrets", () => {
@@ -48,9 +49,28 @@ describe("buildWranglerTriggersConfig", () => {
     expect(buildWranglerTriggersConfig(true)).toBe("");
   });
 
+  it("removes cron triggers when scheduled tasks are disabled", () => {
+    const config = buildWranglerTriggersConfig(false, false);
+    expect(config).toContain("[triggers]");
+    expect(config).toContain("crons = []");
+  });
+
   it("includes cron triggers for production deploys", () => {
     expect(buildWranglerTriggersConfig(false)).toContain("[triggers]");
     expect(buildWranglerTriggersConfig(false)).toContain('crons = ["*/20 * * * *"]');
+  });
+});
+
+describe("parseBooleanEnv", () => {
+  it("uses the default for empty values", () => {
+    expect(parseBooleanEnv(undefined, true)).toBe(true);
+    expect(parseBooleanEnv("", false)).toBe(false);
+  });
+
+  it("recognizes disabled values", () => {
+    expect(parseBooleanEnv("false", true)).toBe(false);
+    expect(parseBooleanEnv("0", true)).toBe(false);
+    expect(parseBooleanEnv("off", true)).toBe(false);
   });
 });
 

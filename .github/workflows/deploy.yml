@@ -19,6 +19,14 @@ on:
         options:
           - production
           - preview
+      scheduled_tasks_enabled:
+        description: 'Enable Cloudflare Cron scheduled tasks'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 permissions:
   contents: read
@@ -162,8 +170,10 @@ jobs:
           REPO_AVATAR: ${{ vars.AVATAR }}
           REPO_PAGE_SIZE: ${{ vars.PAGE_SIZE }}
           REPO_RSS_ENABLE: ${{ vars.RSS_ENABLE }}
+          REPO_SCHEDULED_TASKS_ENABLED: ${{ vars.SCHEDULED_TASKS_ENABLED }}
           REPO_WORKER_NAME: ${{ vars.WORKER_NAME }}
           REPO_DB_NAME: ${{ vars.DB_NAME }}
+          MANUAL_SCHEDULED_TASKS_ENABLED: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.scheduled_tasks_enabled || '' }}
         run: |
           PR_NUMBER="${{ needs.prepare.outputs.pr_number }}"
           if [[ "${{ needs.prepare.outputs.is_production }}" == "true" ]]; then
@@ -185,6 +195,8 @@ jobs:
           echo "avatar=${REPO_AVATAR}" >> $GITHUB_OUTPUT
           echo "page_size=${REPO_PAGE_SIZE}" >> $GITHUB_OUTPUT
           echo "rss_enable=${REPO_RSS_ENABLE}" >> $GITHUB_OUTPUT
+          SCHEDULED_TASKS_ENABLED_VALUE="${MANUAL_SCHEDULED_TASKS_ENABLED:-${REPO_SCHEDULED_TASKS_ENABLED:-true}}"
+          echo "scheduled_tasks_enabled=${SCHEDULED_TASKS_ENABLED_VALUE}" >> $GITHUB_OUTPUT
 
       - name: Deploy to Cloudflare
         id: deploy
@@ -198,6 +210,7 @@ jobs:
           AVATAR: ${{ steps.config.outputs.avatar || '' }}
           PAGE_SIZE: ${{ steps.config.outputs.page_size || '5' }}
           RSS_ENABLE: ${{ steps.config.outputs.rss_enable || 'false' }}
+          SCHEDULED_TASKS_ENABLED: ${{ steps.config.outputs.scheduled_tasks_enabled || 'true' }}
           S3_CACHE_FOLDER: ${{ vars.S3_CACHE_FOLDER || 'cache/' }}
           S3_FOLDER: ${{ vars.S3_FOLDER || 'images/' }}
           S3_REGION: ${{ vars.S3_REGION || 'auto' }}
