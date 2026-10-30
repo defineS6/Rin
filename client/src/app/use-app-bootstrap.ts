@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ConfigWrapper } from "@rin/config";
 import type { Profile } from "../state/profile";
 import { defaultClientConfig } from "../state/config";
-import { applyAppearanceConfig } from "../utils/appearance";
+import { applyAppearanceConfig, resolveThemeColorFromConfig } from "../utils/appearance";
 import { applyThemeColor } from "../utils/theme-color";
 import { readBootstrappedClientConfig } from "./bootstrap-config";
 import { client } from "./runtime";
@@ -28,7 +28,7 @@ export function useAppBootstrap() {
       sessionStorage.setItem("config", JSON.stringify(nextConfig));
       setConfig(new ConfigWrapper(nextConfig, defaultClientConfig));
       applyAppearanceConfig(nextConfig);
-      applyThemeColor(typeof nextConfig["theme.color"] === "string" ? nextConfig["theme.color"] : undefined);
+      applyThemeColor(resolveThemeColorFromConfig(nextConfig));
     };
 
     client.user.profile().then(({ data, error }) => {
@@ -53,7 +53,7 @@ export function useAppBootstrap() {
       const configObject = JSON.parse(cachedConfig) as Record<string, unknown>;
       setConfig(new ConfigWrapper(configObject, defaultClientConfig));
       applyAppearanceConfig(configObject);
-      applyThemeColor(typeof configObject["theme.color"] === "string" ? configObject["theme.color"] : undefined);
+      applyThemeColor(resolveThemeColorFromConfig(configObject));
     }
 
     initializedRef.current = true;

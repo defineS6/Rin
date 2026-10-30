@@ -11,6 +11,7 @@ export const CLIENT_CONFIG_DEFAULTS = new Map(
     "header.layout": "classic",
     "feed.layout": "list",
     "feed.card_variant": "default",
+    "theme.preset": "default",
     "theme.color": "#4f46e5",
     "theme.background_image": "",
     "theme.font_preset": "default",

@@ -445,16 +445,30 @@
         "reveal": "Show on scroll up"
       }
     },
+    "theme_preset": {
+      "title": "Theme preset",
+      "desc": "Choose the site-wide visual preset. Classical Ink & Scroll links rice-paper tones, cinnabar accents, scroll cards, and LXGW WenKai typography",
+      "options": {
+        "default": "Modern Default",
+        "classical": "Classical Ink & Scroll"
+      },
+      "preview": {
+        "default": "Clean modern surfaces with crisp rounded hierarchy for everyday and technical writing.",
+        "classical": "Warm Xuan-paper and night-ink surfaces accented with cinnabar seals, double-line scroll frames, and classical typography."
+      }
+    },
     "feed_card": {
       "title": "Feed card style",
       "desc": "Choose the visual treatment used by article cards across feed, search, and tag lists",
       "options": {
         "default": "Default",
-        "editorial": "Editorial"
+        "editorial": "Editorial",
+        "classical": "Classical scroll"
       },
       "preview": {
         "default": "The current compact card with a simple surface and minimal framing.",
-        "editorial": "A more expressive card with a tinted surface, stronger hierarchy, and gallery-like framing."
+        "editorial": "A more expressive card with a tinted surface, stronger hierarchy, and gallery-like framing.",
+        "classical": "Double-lined scroll framing with corner motifs, mounted cover borders, and cinnabar seal badges."
       }
     },
     "feed_layout": {
@@ -479,7 +493,11 @@
         "violet": "Violet",
         "blue": "Blue",
         "teal": "Teal",
-        "orange": "Orange"
+        "orange": "Orange",
+        "cinnabar": "Cinnabar",
+        "indigo": "Indigo",
+        "bamboo": "Bamboo",
+        "amber": "Amber"
       }
     },
     "background_image": {

@@ -17,7 +17,9 @@ function FeedCardImage({ src, variant }: { src: string; variant: FeedCardVariant
     const imageFrameClass =
         variant === "editorial"
             ? "relative flex max-h-80 w-full flex-row items-center overflow-hidden rounded-[18px]"
-            : "relative flex max-h-80 w-full flex-row items-center overflow-hidden rounded-xl";
+            : variant === "classical"
+                ? "relative flex max-h-80 w-full flex-row items-center overflow-hidden rounded-md"
+                : "relative flex max-h-80 w-full flex-row items-center overflow-hidden rounded-xl";
 
     useEffect(() => {
         if (!blurhash || !canvasRef.current) {
@@ -81,6 +83,13 @@ const FEED_CARD_STYLES: Record<
         summary: "mt-4 line-clamp-5 max-w-3xl text-pretty text-[15px] leading-7 text-neutral-600 dark:text-neutral-300",
         title: "text-2xl font-semibold leading-tight text-neutral-900 text-pretty overflow-hidden transition-colors group-hover:text-theme dark:text-white",
     },
+    classical: {
+        card: "group blog-surface blog-interactive classical-scroll-card relative inline-block w-full break-inside-avoid overflow-hidden rounded-lg p-5 md:p-6 [content-visibility:auto] [contain-intrinsic-size:1px_280px]",
+        imageWrap: "mb-4 overflow-hidden rounded-md border border-[#8c7355]/25 bg-[#f4ede0]/60 p-1.5 dark:border-[#d4b88c]/20 dark:bg-[#2a241f]/60",
+        meta: "mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium tracking-wider text-neutral-500 dark:text-neutral-400",
+        summary: "mt-3.5 line-clamp-4 text-pretty overflow-hidden text-[15px] leading-8 tracking-[0.02em] text-neutral-600 dark:text-neutral-300",
+        title: "text-xl md:text-2xl font-semibold leading-snug tracking-[0.03em] text-neutral-900 text-pretty overflow-hidden transition-colors group-hover:text-theme dark:text-white",
+    },
 };
 
 export type FeedCardProps = {
@@ -125,9 +134,9 @@ export function FeedCard({ id, title, avatar, draft, listed, top, summary, hasht
                 </p>
                 {hasState && (
                     <p className={styles.meta}>
-                        {draft === 1 && <span className="rounded-full bg-neutral-100 px-2 py-0.5 dark:bg-white/10">{t("draft")}</span>}
-                        {listed === 0 && <span className="rounded-full bg-neutral-100 px-2 py-0.5 dark:bg-white/10">{t("unlisted")}</span>}
-                        {top === 1 && <span className="rounded-full bg-theme/10 px-2 py-0.5 text-theme">{t('article.top.title')}</span>}
+                        {draft === 1 && <span className="blog-state-badge rounded-full bg-neutral-100 px-2 py-0.5 dark:bg-white/10">{t("draft")}</span>}
+                        {listed === 0 && <span className="blog-state-badge rounded-full bg-neutral-100 px-2 py-0.5 dark:bg-white/10">{t("unlisted")}</span>}
+                        {top === 1 && <span className="blog-seal-badge rounded-full bg-theme/10 px-2 py-0.5 text-theme">{t('article.top.title')}</span>}
                     </p>
                 )}
                 <p className={styles.summary}>{summary}</p>

@@ -2,7 +2,12 @@ import { useContext } from "react";
 import { ClientConfigContext } from "../state/config";
 import { normalizeFeedCardVariant } from "../components/feed-card-options";
 import { normalizeFeedLayout } from "../components/feed-layout-options";
-import { APPEARANCE_CONFIG_KEYS, normalizeFontPreset } from "../utils/appearance";
+import {
+    APPEARANCE_CONFIG_KEYS,
+    CLASSICAL_THEME_DEFAULTS,
+    normalizeFontPreset,
+    normalizeThemePreset,
+} from "../utils/appearance";
 
 // Site configuration keys
 export const SITE_CONFIG_KEYS = {
@@ -14,6 +19,7 @@ export const SITE_CONFIG_KEYS = {
     feedLayout: "feed.layout",
     feedCardVariant: "feed.card_variant",
     headerLayout: "header.layout",
+    themePreset: APPEARANCE_CONFIG_KEYS.themePreset,
     themeColor: "theme.color",
     backgroundImage: APPEARANCE_CONFIG_KEYS.backgroundImage,
     fontPreset: APPEARANCE_CONFIG_KEYS.fontPreset,
@@ -30,6 +36,22 @@ export function useSiteConfig() {
                 ? parseInt(pageSizeValue, 10)
                 : NaN;
 
+    const themePreset = normalizeThemePreset(config.get<string>(SITE_CONFIG_KEYS.themePreset));
+    const rawCardVariant = config.config[SITE_CONFIG_KEYS.feedCardVariant];
+    const effectiveCardVariant =
+        typeof rawCardVariant === "string" && rawCardVariant.trim().length > 0
+            ? rawCardVariant
+            : themePreset === "classical"
+                ? CLASSICAL_THEME_DEFAULTS.feedCardVariant
+                : config.get<string>(SITE_CONFIG_KEYS.feedCardVariant) || "default";
+    const rawThemeColor = config.config[SITE_CONFIG_KEYS.themeColor];
+    const effectiveThemeColor =
+        typeof rawThemeColor === "string" && rawThemeColor.trim().length > 0
+            ? rawThemeColor
+            : themePreset === "classical"
+                ? CLASSICAL_THEME_DEFAULTS.themeColor
+                : config.get<string>(SITE_CONFIG_KEYS.themeColor) || "#4f46e5";
+
     return {
         name: config.get<string>(SITE_CONFIG_KEYS.name) || "Rin",
         description: config.get<string>(SITE_CONFIG_KEYS.description) || "",
@@ -37,11 +59,18 @@ export function useSiteConfig() {
         pageSize: Number.isFinite(parsedPageSize) ? parsedPageSize : 5,
         headerBehavior: config.get<string>(SITE_CONFIG_KEYS.headerBehavior) || "fixed",
         feedLayout: normalizeFeedLayout(config.get<string>(SITE_CONFIG_KEYS.feedLayout) || "list"),
-        feedCardVariant: normalizeFeedCardVariant(config.get<string>(SITE_CONFIG_KEYS.feedCardVariant) || "default"),
+        feedCardVariant: normalizeFeedCardVariant(effectiveCardVariant),
         headerLayout: config.get<string>(SITE_CONFIG_KEYS.headerLayout) || "classic",
-        themeColor: config.get<string>(SITE_CONFIG_KEYS.themeColor) || "#4f46e5",
+        themePreset,
+        themeColor: effectiveThemeColor,
         backgroundImage: config.get<string>(SITE_CONFIG_KEYS.backgroundImage) || "",
-        fontPreset: normalizeFontPreset(config.get<string>(SITE_CONFIG_KEYS.fontPreset)),
+        fontPreset: normalizeFontPreset(
+            typeof config.config[SITE_CONFIG_KEYS.fontPreset] === "string"
+                ? (config.config[SITE_CONFIG_KEYS.fontPreset] as string)
+                : themePreset === "classical"
+                    ? CLASSICAL_THEME_DEFAULTS.fontPreset
+                    : config.get<string>(SITE_CONFIG_KEYS.fontPreset),
+        ),
     };
 }
 

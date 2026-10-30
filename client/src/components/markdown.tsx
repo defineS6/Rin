@@ -238,7 +238,7 @@ export function Markdown({ content }: { content: string }) {
         blockquote({ children, ...props }) {
           return (
             <blockquote
-              className="my-4 rounded-r-xl border-l-4 border-theme/40 bg-theme/5 py-3 pl-4 pr-3 italic text-neutral-600 dark:bg-theme/10 dark:text-neutral-300"
+              className="blog-blockquote my-4 rounded-r-xl border-l-4 border-theme/40 bg-theme/5 py-3 pl-4 pr-3 italic text-neutral-600 dark:bg-theme/10 dark:text-neutral-300"
               {...props}
             >
               {children}
@@ -311,7 +311,7 @@ export function Markdown({ content }: { content: string }) {
             <h2
               id={children?.toString()}
               {...props}
-              className={`${props.className || ""} mt-8 text-2xl font-semibold leading-tight text-neutral-900 dark:text-white`.trim()}
+              className={`${props.className || ""} blog-heading-2 mt-8 text-2xl font-semibold leading-tight text-neutral-900 dark:text-white`.trim()}
               style={{ ...props.style, scrollMarginTop: "var(--header-scroll-offset, 7rem)" }}
             >
               {children}
@@ -374,7 +374,7 @@ export function Markdown({ content }: { content: string }) {
           );
         },
         hr({ children, ...props }) {
-          return <hr className="my-6 border-black/5 dark:border-white/10" {...props} />;
+          return <hr className="blog-divider my-6 border-black/5 dark:border-white/10" {...props} />;
         },
         table: ({ node, ...props }) => <table className="table" {...props} />,
         th: ({ node, ...props }) => (

@@ -445,16 +445,30 @@
         "reveal": "上划时显示"
       }
     },
+    "theme_preset": {
+      "title": "主题风格",
+      "desc": "选择全站视觉主题预设，切换「古风雅韵」将联动宣纸水墨背景、朱砂强调色、书卷卡片与霞鹜文楷字体",
+      "options": {
+        "default": "现代默认",
+        "classical": "古风雅韵"
+      },
+      "preview": {
+        "default": "干净明快的现代留白与圆角层次，适合日常与技术写作。",
+        "classical": "宣纸水墨底色配朱砂印泥点缀，含中式双线锦框、朱文印章与卷轴批注排版。"
+      }
+    },
     "feed_card": {
       "title": "文章卡片样式",
       "desc": "选择文章列表、搜索结果和标签页中卡片的视觉风格",
       "options": {
         "default": "默认",
-        "editorial": "杂志风"
+        "editorial": "杂志风",
+        "classical": "古风书卷"
       },
       "preview": {
         "default": "当前这套紧凑卡片，表面处理简单，干净直接。",
-        "editorial": "更有展示感的卡片，带轻微主题染色、更强层级和类似画册的 framing。"
+        "editorial": "更有展示感的卡片，带轻微主题染色、更强层级和类似画册的 framing。",
+        "classical": "中式双线内框与四角折角锦纹，配画轴装裱封面框与朱文方印置顶标识。"
       }
     },
     "feed_layout": {
@@ -479,7 +493,11 @@
         "violet": "紫色",
         "blue": "蓝色",
         "teal": "青绿",
-        "orange": "橙色"
+        "orange": "橙色",
+        "cinnabar": "朱砂",
+        "indigo": "黛蓝",
+        "bamboo": "竹青",
+        "amber": "秋香"
       }
     },
     "background_image": {

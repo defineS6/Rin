@@ -18,8 +18,18 @@ import {
 import { FEED_CARD_VARIANTS, normalizeFeedCardVariant } from "../components/feed-card-options";
 import { FeedCardPreview } from "../components/feed-card-preview";
 import { FEED_LAYOUT_OPTIONS, normalizeFeedLayout } from "../components/feed-layout-options";
+import { SettingsPreviewCard } from "../components/settings-preview-card";
 import { useSiteConfig } from "../hooks/useSiteConfig";
-import { APPEARANCE_CONFIG_KEYS, FONT_PRESETS, applyAppearanceConfig, normalizeFontPreset } from "../utils/appearance";
+import {
+  APPEARANCE_CONFIG_KEYS,
+  CLASSICAL_THEME_DEFAULTS,
+  FONT_PRESETS,
+  THEME_PRESETS,
+  applyAppearanceConfig,
+  normalizeFontPreset,
+  normalizeThemePreset,
+  resolveThemeColorFromConfig,
+} from "../utils/appearance";
 import { applyThemeColor, normalizeThemeColor } from "../utils/theme-color";
 import { AISummarySettings } from "./settings-ai";
 import { ItemButton, ItemImageInput, ItemInput, ItemSwitch, ItemTitle, ItemWithUpload } from "./settings-items";
@@ -49,6 +59,10 @@ const THEME_COLOR_OPTIONS = [
   { label: "Blue", value: "#4f46e5" },
   { label: "Teal", value: "#0f766e" },
   { label: "Orange", value: "#ea580c" },
+  { label: "Cinnabar", value: "#b83b2b" },
+  { label: "Indigo", value: "#2e4e7e" },
+  { label: "Bamboo", value: "#4f6f52" },
+  { label: "Amber", value: "#b58938" },
 ];
 
 export function Settings() {
@@ -70,7 +84,7 @@ export function Settings() {
   const { showAlert, AlertUI } = useAlert();
 
   function getDraftThemeColor(nextDraft: SettingsDraft) {
-    return typeof nextDraft.clientConfig["theme.color"] === "string" ? nextDraft.clientConfig["theme.color"] : undefined;
+    return resolveThemeColorFromConfig(nextDraft.clientConfig);
   }
 
   useEffect(() => {
@@ -102,11 +116,26 @@ export function Settings() {
   const { clientConfig, serverConfig } = useMemo(() => createSettingsConfigWrappers(draft), [draft]);
   const aiValue = useMemo(() => buildAIConfigDraftValue(draft, hasStoredAiApiKey), [draft, hasStoredAiApiKey]);
   const hasUnsavedChanges = !areSettingsDraftsEqual(draft, initialDraft);
-  const themeColorValue = normalizeThemeColor(String(clientConfig.get("theme.color") ?? "#4f46e5"));
+  const themePresetValue = normalizeThemePreset(clientConfig.get<string>(APPEARANCE_CONFIG_KEYS.themePreset));
+  const themeColorValue = normalizeThemeColor(
+    resolveThemeColorFromConfig(draft.clientConfig) ?? String(clientConfig.get("theme.color") ?? "#4f46e5"),
+  );
   const backgroundImageValue = String(clientConfig.get(APPEARANCE_CONFIG_KEYS.backgroundImage) ?? "");
-  const fontPresetValue = normalizeFontPreset(clientConfig.get<string>(APPEARANCE_CONFIG_KEYS.fontPreset));
+  const fontPresetValue = normalizeFontPreset(
+    typeof draft.clientConfig[APPEARANCE_CONFIG_KEYS.fontPreset] === "string"
+      ? (draft.clientConfig[APPEARANCE_CONFIG_KEYS.fontPreset] as string)
+      : themePresetValue === "classical"
+        ? CLASSICAL_THEME_DEFAULTS.fontPreset
+        : clientConfig.get<string>(APPEARANCE_CONFIG_KEYS.fontPreset),
+  );
   const feedLayoutValue = normalizeFeedLayout(String(clientConfig.get("feed.layout") ?? "list"));
-  const feedCardVariantValue = normalizeFeedCardVariant(String(clientConfig.get("feed.card_variant") ?? "default"));
+  const feedCardVariantValue = normalizeFeedCardVariant(
+    typeof draft.clientConfig["feed.card_variant"] === "string"
+      ? (draft.clientConfig["feed.card_variant"] as string)
+      : themePresetValue === "classical"
+        ? CLASSICAL_THEME_DEFAULTS.feedCardVariant
+        : String(clientConfig.get("feed.card_variant") ?? "default"),
+  );
   const previewSiteName = String(clientConfig.get("site.name") ?? clientConfig.default("site.name") ?? "Rin");
   const previewSiteAvatar = String(clientConfig.get("site.avatar") ?? clientConfig.default("site.avatar") ?? "");
 
@@ -117,6 +146,52 @@ export function Settings() {
   function setAppearanceConfigValue(key: string, value: string) {
     setConfigValue("client", key, value);
     applyAppearanceConfig({ ...draft.clientConfig, [key]: value });
+  }
+
+  // 切换全局主题风格预设，并智能联动主题色、字体与卡片样式
+  function handleThemePresetChange(rawPreset: string) {
+    const nextPreset = normalizeThemePreset(rawPreset);
+    const nextClientConfig: Record<string, unknown> = {
+      ...draft.clientConfig,
+      [APPEARANCE_CONFIG_KEYS.themePreset]: nextPreset,
+    };
+
+    const currentColor = typeof draft.clientConfig["theme.color"] === "string" ? draft.clientConfig["theme.color"] : "";
+    const currentFont =
+      typeof draft.clientConfig[APPEARANCE_CONFIG_KEYS.fontPreset] === "string"
+        ? draft.clientConfig[APPEARANCE_CONFIG_KEYS.fontPreset]
+        : "";
+    const currentCard =
+      typeof draft.clientConfig["feed.card_variant"] === "string" ? draft.clientConfig["feed.card_variant"] : "";
+
+    if (nextPreset === "classical") {
+      if (!currentColor || currentColor.toLowerCase() === "#4f46e5") {
+        nextClientConfig["theme.color"] = CLASSICAL_THEME_DEFAULTS.themeColor;
+      }
+      if (!currentFont || currentFont === "default") {
+        nextClientConfig[APPEARANCE_CONFIG_KEYS.fontPreset] = CLASSICAL_THEME_DEFAULTS.fontPreset;
+      }
+      if (!currentCard || currentCard === "default") {
+        nextClientConfig["feed.card_variant"] = CLASSICAL_THEME_DEFAULTS.feedCardVariant;
+      }
+    } else {
+      if (currentColor.toLowerCase() === CLASSICAL_THEME_DEFAULTS.themeColor) {
+        nextClientConfig["theme.color"] = "#4f46e5";
+      }
+      if (currentFont === CLASSICAL_THEME_DEFAULTS.fontPreset) {
+        nextClientConfig[APPEARANCE_CONFIG_KEYS.fontPreset] = "default";
+      }
+      if (currentCard === CLASSICAL_THEME_DEFAULTS.feedCardVariant) {
+        nextClientConfig["feed.card_variant"] = "default";
+      }
+    }
+
+    setDraft((current) => ({
+      ...current,
+      clientConfig: nextClientConfig,
+    }));
+    applyAppearanceConfig(nextClientConfig);
+    applyThemeColor(resolveThemeColorFromConfig(nextClientConfig));
   }
 
   function handleReset() {
@@ -135,6 +210,7 @@ export function Settings() {
       setHasStoredAiApiKey(state.hasStoredAiApiKey || aiValue.apiKey.trim().length > 0);
       mergeSessionConfig(state.draft.clientConfig);
       applyAppearanceConfig(state.draft.clientConfig);
+      applyThemeColor(getDraftThemeColor(state.draft));
       window.dispatchEvent(new Event("storage"));
       showAlert(t("settings.ai_summary.save_success"));
     } catch (err) {
@@ -248,10 +324,106 @@ export function Settings() {
               <SettingsCardRow
                 header={
                   <SettingsCardHeader
-                    title={t("settings.header_layout.title")}
-                    description={t("settings.header_layout.desc")}
+                    title={t("settings.theme_preset.title")}
+                    description={t("settings.theme_preset.desc")}
                   />
                 }
+                action={
+                  <SearchableSelect
+                    value={themePresetValue}
+                    onChange={(value) => {
+                      handleThemePresetChange(value);
+                    }}
+                    options={THEME_PRESETS.map((value) => ({
+                      value,
+                      label: t(`settings.theme_preset.options.${value}`),
+                    }))}
+                    placeholder={t("settings.theme_preset.title")}
+                    emptyLabel={t("no_more")}
+                    searchable={false}
+                  />
+                }
+              />
+              <SettingsCardBody>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {THEME_PRESETS.map((preset) => (
+                    <SettingsPreviewCard
+                      key={preset}
+                      selected={themePresetValue === preset}
+                      title={t(`settings.theme_preset.options.${preset}`)}
+                      description={t(`settings.theme_preset.preview.${preset}`)}
+                      onClick={() => {
+                        handleThemePresetChange(preset);
+                      }}
+                      preview={
+                        preset === "classical" ? (
+                          <div className="classical-scroll-card flex w-full flex-col justify-between rounded-lg border border-[#8c7355]/30 bg-[#fbf8f1] p-4 text-[#2b2520] dark:border-[#d4b88c]/20 dark:bg-[#211e1b] dark:text-[#ebe4d8]">
+                            <div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="inline-flex items-center rounded-[3px] border border-[#b83b2b]/65 bg-[#b83b2b]/10 px-2 py-0.5 text-[11px] font-semibold tracking-[0.14em] text-[#b83b2b]">
+                                  {t("article.top.title")}
+                                </span>
+                                <span className="text-[11px] tracking-widest text-[#6d6053] dark:text-[#b0a494]">
+                                  宣纸 · 水墨 · 朱砂
+                                </span>
+                              </div>
+                              <p className="mt-2.5 text-base font-semibold tracking-[0.04em]">
+                                竹露松风 · 书卷雅韵
+                              </p>
+                              <p className="mt-1.5 text-xs leading-6 text-[#6d6053] dark:text-[#b0a494]">
+                                温润宣纸底色配浓墨文楷字形，辅以朱文方印与古籍双线锦框。
+                              </p>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 pt-2 border-t border-[#8c7355]/15 dark:border-[#d4b88c]/15">
+                              <span className="rounded-[4px] border border-[#b83b2b]/30 bg-[#b83b2b]/5 px-2 py-0.5 text-[11px] text-[#b83b2b]">
+                                #诗词
+                              </span>
+                              <span className="rounded-[4px] border border-[#b83b2b]/30 bg-[#b83b2b]/5 px-2 py-0.5 text-[11px] text-[#b83b2b]">
+                                #随笔
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex w-full flex-col justify-between rounded-2xl border border-black/5 bg-white p-4 text-neutral-900 shadow-sm dark:border-white/10 dark:bg-neutral-900 dark:text-white">
+                            <div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                                  {t("article.top.title")}
+                                </span>
+                                <span className="text-[11px] text-neutral-400">
+                                  Modern · Clean
+                                </span>
+                              </div>
+                              <p className="mt-2.5 text-base font-semibold">
+                                Modern Minimalist Surface
+                              </p>
+                              <p className="mt-1.5 text-xs leading-6 text-neutral-500 dark:text-neutral-400">
+                                干净利落的现代圆角卡片与高对比无衬线排版，专注纯粹阅读体验。
+                              </p>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 pt-2 border-t border-black/5 dark:border-white/10">
+                              <span className="rounded-full border border-indigo-500/15 bg-indigo-500/5 px-2.5 py-0.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                                #design
+                              </span>
+                              <span className="rounded-full border border-indigo-500/15 bg-indigo-500/5 px-2.5 py-0.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                                #reading
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      }
+                    />
+                  ))}
+                </div>
+              </SettingsCardBody>
+              <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
+                <SettingsCardRow
+                  header={
+                    <SettingsCardHeader
+                      title={t("settings.header_layout.title")}
+                      description={t("settings.header_layout.desc")}
+                    />
+                  }
                 action={
                   <SearchableSelect
                     value={normalizeHeaderLayout(String(clientConfig.get("header.layout") ?? "classic"))}
@@ -289,6 +461,7 @@ export function Settings() {
                   ))}
                 </div>
               </SettingsCardBody>
+              </div>
               <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
                 <SettingsCardRow
                   header={
@@ -339,7 +512,7 @@ export function Settings() {
                   }
                 />
                 <SettingsCardBody>
-                  <div className="grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-3 md:grid-cols-3">
                     {FEED_CARD_VARIANTS.map((value) => (
                       <FeedCardPreview
                         key={value}
